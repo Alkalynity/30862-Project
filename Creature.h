@@ -1,12 +1,17 @@
 #include "Base.h"
-#include "Item.h"
 #ifndef CREATURE_H_
 #define CREATURE_H_
 
 class Creature : public Base {
+public:
+	char* vulnerability[100];
+	Trigger* attack;
 
-	Item* vulnerability;
-	char* attack;
+	Creature() {
+		name = "NO NAME CREATURE";
+		description = "NO DESCRIPTION";
+		attack = NULL;
+	}
 
 };
 

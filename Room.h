@@ -8,12 +8,19 @@
 #define ROOM_H_
 
 class Room : public Base {
-
+public:
 	char* type;
-	Border* borders;
-	Creature* creatures;
-	Container* containers;
-	Item* items;
+	Border* borders[100];
+	char* creatures[100];
+	char* containers[100];
+	char* items[100];
+
+	Room() {
+		borders[0] = NULL;
+		creatures[0] = NULL;
+		containers[0] = NULL;
+		items[0] = NULL;
+	}
 
 };
 

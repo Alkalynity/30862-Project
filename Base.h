@@ -1,14 +1,15 @@
 #include "Trigger.h"
+#include <iostream>
 #ifndef BASE_H_
 #define BASE_H_
 
 class Base {
 
-protected:
+public:
 	char* name;
 	char* status;
 	char* description;
-	Trigger* triggers;
+	Trigger* triggers[100];
 };
 
 #endif

@@ -3,8 +3,8 @@
 #define BORDER_H_
 
 class Border : public Base {
-
-	char* rooms; // may want to change this to array of Room later
+public:
+	char* room; // may want to change this to Room later?
 	char* direction;
 
 };

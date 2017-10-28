@@ -4,9 +4,9 @@
 #define CONTAINER_H_
 
 class Container : public Base {
-
-	Item* accepts;
-	Item* items;
+public:
+	char* accepts[100];
+	char* items[100];
 
 };
 
