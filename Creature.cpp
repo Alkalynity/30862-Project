@@ -1,19 +1,18 @@
-#include "Creature.h"
-
-Creature::Creature(rapidxml::xml_node<>*node) {
+#include "Container.h"
+Container::Container(rapidxml::xml_node<> * node) {
+	node = node->first_node();
 	std::string node_name;
 	std::string value;
 
-	node_name = node->name();
-	value = node->value();
-	int i = 0; // vulnerabilities iterator
-
 	while (node != NULL) {
+		node_name = node->name();
+		value = (std::string)node->value();
+
 		if (node_name == (std::string)"name") {
 			name = value;
 		}
 
-		if (node_name == (std::string)"description") {
+		else if (node_name == (std::string)"description") {
 			description = value;
 		}
 
@@ -21,12 +20,20 @@ Creature::Creature(rapidxml::xml_node<>*node) {
 			status = value;
 		}
 
-		else if (node_name == (std::string)"vulnerabilities") {
-			vulnerabilities[i] = value;
-			i++;
+		else if (node_name == (std::string)"item") { // check this
+			items.push_back((std::string)value);
 		}
 
-		// to do: load triggers, attack
+		else if (node_name == (std::string)"accept") {
+			accepts.push_back((std::string)value);
+		}
+
+		// to do: add triggers
+		node = node->next_sibling();
+
 	}
-	node = node->next_sibling();
+}
+
+Container::~Container() {
+
 }
