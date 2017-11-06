@@ -96,8 +96,9 @@ void Map::fragmentXmlNodes(rapidxml::xml_node<>* map_node, std::queue<rapidxml::
 void Map::printItems() {
 	std::map<std::string, Item*>::iterator p = items.begin();
 	while(p != items.end()) {
-		std::cout<< p->first << std::endl;
-		std::cout<< p->second -> name << std::endl;
+		//std::cout<< p->first << std::endl;
+		std::cout<< "Item name: " << p->second -> name << std::endl;
+		std::cout << "Item writing:  " << p->second->writing << std::endl;
 		++p;
 	}
 }
