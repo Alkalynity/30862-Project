@@ -29,6 +29,8 @@ Container::Container(rapidxml::xml_node<> * node) {
 	while (node != NULL) {
 		node_name = node->name();
 		value = (std::string)node->value();
+		int i = 0; // items iterator
+		int j = 0; // accepts iterator
 
 		if (node_name == (std::string)"name") {
 			name = value;
@@ -42,8 +44,19 @@ Container::Container(rapidxml::xml_node<> * node) {
 			status = value;
 		}
 
-		// to do, add items, triggers, accepts
+		else if (node_name == (std::string)"item") { // check this
+			items[i] = value;
+			i++;
+		}
+
+		else if (node_name == (std::string)"accept") {
+			accepts[j] = value;
+			j++;
+		}
+
+		// to do: add triggers
 		node = node->next_sibling();
+		
 	}
 }
 
