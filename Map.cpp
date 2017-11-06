@@ -45,20 +45,18 @@ void Map::createZorkMap(std::string filename) {
 	while(items_nodes.size() != 0){
 		newItem = new Item(items_nodes.front());
 		all_objects[newItem -> name] = newItem;
-		std::cout << "all_objects object: " << all_objects[newItem->name]->name << std::endl;
 		items[newItem -> name] = newItem;
-		std::cout << "Item name: " << items[newItem->name]->name << std::endl;
 		items_nodes.pop();
 	}
-/*
+
 	Container * newContainer;
 	while(containers_nodes.size() != 0){
-		newContainer = new Container(rooms_nodes.front());
+		newContainer = new Container(containers_nodes.front());
 		all_objects[newContainer -> name] = newContainer;
 		containers[newContainer -> name] = newContainer;
 		containers_nodes.pop();
 	}
-
+/*
 	Creature * newCreature;
 	while(creatures_nodes.size() != 0){
 		newCreature = new Room(creatures_nodes.front());
@@ -73,19 +71,15 @@ void Map::fragmentXmlNodes(rapidxml::xml_node<>* map_node, std::queue<rapidxml::
 	rapidxml::xml_node<>* node = map_node -> first_node();
 	while(node != NULL){
 		if((std::string)node->name() == (std::string)"room"){
-			std::cout << node->name() << std::endl;
 			rooms.push(node);
 		}
 		else if((std::string)node -> name() == (std::string)"item") {
-			std::cout << node->name() << std::endl;
 			items.push(node);
 		}
 		else if((std::string)node -> name() == (std::string)"container") {
-			std::cout << node->name() << std::endl;
 			containers.push(node);
 		}
 		else if((std::string)node -> name() == (std::string)"creature") {
-			std::cout << node->name() << std::endl;
 			creatures.push(node);
 		}
 		node = node -> next_sibling();
@@ -100,5 +94,17 @@ void Map::printItems() {
 		std::cout<< "Item name: " << p->second -> name << std::endl;
 		std::cout << "Item writing:  " << p->second->writing << std::endl;
 		++p;
+	}
+}
+
+void Map::printCreatures() {
+
+}
+
+void Map::printContainers() {
+	std::map<std::string, Container*>::iterator p = containers.begin();
+	while (p != containers.end()) {
+		std::cout << "Container name: " << p->second->name << std::endl;
+		p++;
 	}
 }
