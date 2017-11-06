@@ -43,6 +43,7 @@ Container::Container(rapidxml::xml_node<> * node) {
 		}
 
 		// to do, add items, triggers, accepts
+		node = node->next_sibling();
 	}
 }
 
