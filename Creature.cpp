@@ -13,20 +13,23 @@ Creature::Creature(rapidxml::xml_node<>*node) {
 		if (node_name == (std::string)"name") {
 			name = value;
 		}
-
 		else if (node_name == (std::string)"description") {
 			description = value;
 		}
-
 		else if (node_name == (std::string)"status") {
 			status = value;
 		}
-
 		else if (node_name == (std::string)"vulnerability") {
 			vulnerabilities.push_back((std::string)value);
 		}
-
-		// to do: load triggers, attack
+		else if (node_name == (std::string)"trigger") {
+			Trigger* trigger = new Trigger(node);
+			triggers.push_back(trigger);
+		}
+		else if (node_name == (std::string)"attack") {
+			Trigger* trigger = new Trigger(node);
+			attack = trigger;
+		}
 
 		node = node->next_sibling();
 	}

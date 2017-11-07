@@ -18,6 +18,7 @@ int main(int argc, char* argv[]) {
 	game -> printItems();
 	game->printContainers();
 	game->printCreatures();
+	game->printRooms();
     return 0;
 }
 

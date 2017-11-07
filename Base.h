@@ -13,7 +13,7 @@ public:
 	std::string name;
 	std::string status;
 	std::string description;
-	//std::vector<Trigger*>triggers;
+	std::vector<Trigger*>triggers;
 	Base();
 	~Base();
 

@@ -39,6 +39,7 @@ public:
 	void printContainers();
 	void printCreatures();
 	void printRooms();
+	void printTriggers(Trigger* trigger);
 
 private:
 	void createZorkMap(std::string filename);

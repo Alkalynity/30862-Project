@@ -6,6 +6,8 @@ Border::Border(rapidxml::xml_node<>* node) {
 	std::string value;
 
 	while (node != NULL) {
+		node_name = node->name();
+		value = (std::string)node->value();
 		if (node_name == (std::string)"name") {
 			name = value;
 		}

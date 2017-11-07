@@ -114,6 +114,9 @@
     <ClInclude Include="Base.h" />
     <ClInclude Include="Container.h" />
     <ClInclude Include="Creature.h" />
+    <ClInclude Include="Border.h" />
+    <ClInclude Include="Condition.h" />
+    <ClInclude Include="Room.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="rapidxml.hpp" />
@@ -129,6 +132,10 @@
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="Border.cpp" />
+    <ClCompile Include="Room.cpp" />
+    <ClCompile Include="Condition.cpp" />
+    <ClCompile Include="Trigger.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

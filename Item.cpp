@@ -11,6 +11,10 @@ Item::Item(rapidxml::xml_node<> * item_node){
 
 	std::string node_name;
 	std::string value;
+	writing = "Item has no writing.";
+	name = "NO NAME";
+	description = "Item has no description.";
+	status = "";
 
 	while(item_node != 0) {
 		node_name = item_node -> name();
@@ -24,8 +28,8 @@ Item::Item(rapidxml::xml_node<> * item_node){
 			writing = value;
 		}
 		else if(node_name == (std::string)"turnon") {
-			//needs to have a function to set up the turn on actions
-			//turn_on = 0;
+			Trigger* trigger = new Trigger(item_node);
+			turn_on = trigger;
 		}
 
 		else if(node_name== (std::string)"status") {
@@ -34,9 +38,13 @@ Item::Item(rapidxml::xml_node<> * item_node){
 		else if(node_name == (std::string)"description") {
 			description = value;
 		}
+		else if (node_name == (std::string)"trigger") {
+			Trigger* trigger = new Trigger(item_node);
+			triggers.push_back(trigger);
+		}
+
 		item_node = item_node -> next_sibling();
 
-		// to do: turnon, triggers
 	}
 }
 
