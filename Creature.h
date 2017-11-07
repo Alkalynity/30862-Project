@@ -8,6 +8,7 @@ public:
 	Trigger* attack;
 
 	Creature(rapidxml::xml_node<>*);
+	~Creature();
 
 };
 

@@ -17,6 +17,7 @@ int main(int argc, char* argv[]) {
 	Map * game = new Map("xml_test.xml");
 	game -> printItems();
 	game->printContainers();
+	game->printCreatures();
     return 0;
 }
 

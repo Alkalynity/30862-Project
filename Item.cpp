@@ -35,6 +35,8 @@ Item::Item(rapidxml::xml_node<> * item_node){
 			description = value;
 		}
 		item_node = item_node -> next_sibling();
+
+		// to do: turnon, triggers
 	}
 }
 

@@ -3,10 +3,11 @@
 #define BORDER_H_
 
 class Border : public Base {
-
-	char* rooms; // may want to change this to array of Room later
-	char* direction;
-
+public:
+	Border(rapidxml::xml_node<>*);
+	~Border();
+	std::string room;
+	std::string direction;
 };
 
 #endif

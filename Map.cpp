@@ -32,7 +32,7 @@ void Map::createZorkMap(std::string filename) {
 	std::queue<rapidxml::xml_node<> *> creatures_nodes;
 
 	fragmentXmlNodes(map_node, rooms_nodes, items_nodes, containers_nodes, creatures_nodes);
-/*
+
 	Room* newRoom;
 	while(rooms_nodes.size() != 0){
 		newRoom = new Room(rooms_nodes.front());
@@ -40,7 +40,7 @@ void Map::createZorkMap(std::string filename) {
 		rooms[newRoom -> name] = newRoom;
 		rooms_nodes.pop();
 	}
-*/
+
 	Item* newItem;
 	while(items_nodes.size() != 0){
 		newItem = new Item(items_nodes.front());
@@ -56,14 +56,14 @@ void Map::createZorkMap(std::string filename) {
 		containers[newContainer -> name] = newContainer;
 		containers_nodes.pop();
 	}
-/*
+
 	Creature * newCreature;
 	while(creatures_nodes.size() != 0){
-		newCreature = new Room(creatures_nodes.front());
+		newCreature = new Creature(creatures_nodes.front());
 		all_objects[newCreature -> name] = newCreature;
 		creatures[newCreature -> name] = newCreature;
 		creatures_nodes.pop();
-	}*/
+	}
 }
 
 void Map::fragmentXmlNodes(rapidxml::xml_node<>* map_node, std::queue<rapidxml::xml_node<>*> &rooms, std::queue<rapidxml::xml_node<>*>&items, std::queue<rapidxml::xml_node<>*> &containers, std::queue<rapidxml::xml_node<>*> &creatures) {
@@ -89,6 +89,7 @@ void Map::fragmentXmlNodes(rapidxml::xml_node<>* map_node, std::queue<rapidxml::
 
 void Map::printItems() {
 	std::map<std::string, Item*>::iterator p = items.begin();
+	std::cout << "///// ITEMS /////" << std::endl;
 	while(p != items.end()) {
 		//std::cout<< p->first << std::endl;
 		std::cout<< "Item name: " << p->second -> name << std::endl;
@@ -98,13 +99,70 @@ void Map::printItems() {
 }
 
 void Map::printCreatures() {
+	std::map<std::string, Creature*>::iterator p = creatures.begin();
+	std::cout << "///// CREATURES /////" << std::endl;
+	while (p != creatures.end()) {
+		std::cout << "Creature name: " << p->second->name << std::endl;
+		// print vulnerabilities vector
+		std::cout << "Vulnerability: ";
+		for (std::vector<std::string>::iterator q = p->second->vulnerabilities.begin(); q != p->second->vulnerabilities.end(); ++q) {
+			std::cout << *q;
+		}
+		std::cout << "\n";
+		++p;
+	}
+}
 
+void Map::printRooms() {
+	std::map<std::string, Room*>::iterator p = rooms.begin();
+	std::cout << "///// ROOMS /////" << std::endl;
+	while (p != rooms.end()) {
+		std::cout << "Room name:" << p->second->name << std::endl;
+		std::cout << "Type: " << p->second->type << std::endl;
+		// print items vector
+		std::cout << "Items: ";
+		for (std::vector<std::string>::iterator q = p->second->items.begin(); q != p->second->items.end(); ++q) {
+			std::cout << *q << " ";
+		}
+		std::cout << std::endl;
+		// print containers vector
+		std::cout << "Containers: ";
+		for (std::vector<std::string>::iterator q = p->second->containers.begin(); q != p->second->containers.end(); ++q) {
+			std::cout << *q << " ";
+		}
+		std::cout << std::endl;
+		// print creatures vector
+		std::cout << "Creatures: ";
+		for (std::vector<std::string>::iterator q = p->second->creatures.begin(); q != p->second->creatures.end(); ++q) {
+			std::cout << *q << " ";
+		}
+		std::cout << std::endl;
+		// print borders vector
+		std::cout << "Borders: " << std::endl;
+		for (std::vector<Border*>::iterator q = p->second->borders.begin(); q != p->second->borders.end(); ++q) {
+			std::cout << "Name: ";
+		}
+		std::cout << std::endl;
+	}
 }
 
 void Map::printContainers() {
 	std::map<std::string, Container*>::iterator p = containers.begin();
+	std::cout << "///// CONTAINERS /////" << std::endl;
 	while (p != containers.end()) {
 		std::cout << "Container name: " << p->second->name << std::endl;
+		std::cout << "Items: ";
+		// print items vector
+		for (std::vector<std::string>::iterator q = p->second->items.begin(); q != p->second->items.end(); ++q) {
+			std::cout << *q << " ";
+		}
+		// print accept vector
+		std::cout << "\nAccepts: ";
+		for (std::vector<std::string>::iterator q = p->second->accepts.begin(); q != p->second->accepts.end(); ++q) {
+			std::cout << *q << " ";
+		}
+		std::cout << "\n";
+
 		p++;
 	}
 }

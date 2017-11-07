@@ -13,16 +13,16 @@
 #include <map>
 #include <queue>
 #include "Item.h"
-//#include "Creature.h"
-//#include "Container.h"
+#include "Creature.h"
 #include "Base.h"
-//#include "Room.h"
+#include "Room.h"
 #include "Trigger.h"
 #include <sstream>
 #include <iterator>
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 #include "rapidxml_print.hpp"
+#include "Container.h"
 
 
 class Map {
@@ -31,11 +31,14 @@ public:
 	virtual ~Map();
 	std::map<std::string, Base*> all_objects;
 	std::map<std::string, Item*> items;
-	//std::map<char*, Container*> containers;
-	//std::map<char*, Creature*> creatures;
-	//std::map<char*, Room*> rooms;
+	std::map<std::string, Container*> containers;
+	std::map<std::string, Creature*> creatures;
+	std::map<std::string, Room*> rooms;
 	//map<char*, char*> lookup;
 	void printItems();
+	void printContainers();
+	void printCreatures();
+	void printRooms();
 
 private:
 	void createZorkMap(std::string filename);

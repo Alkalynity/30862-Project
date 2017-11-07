@@ -13,9 +13,10 @@ public:
 	std::string name;
 	std::string status;
 	std::string description;
-	//std::vector<Tigger*>triggers;
+	//std::vector<Trigger*>triggers;
 	Base();
-	virtual ~Base();
+	~Base();
+
 };
 
 #endif
