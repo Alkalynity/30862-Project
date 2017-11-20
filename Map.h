@@ -41,6 +41,7 @@ public:
 	void printRooms();
 	void printTriggers(Trigger* trigger);
 	void run();
+	bool game_over;
 
 private:
 	void createZorkMap(std::string filename);
@@ -48,12 +49,17 @@ private:
 	void fragmentXmlNodes(rapidxml::xml_node<>*, std::queue<rapidxml::xml_node<>*>&, std::queue<rapidxml::xml_node<> *>&, std::queue<rapidxml::xml_node<> *>&,std::queue<rapidxml::xml_node<> *>&);
 	bool checkInput(std::string input);
 	void checkTriggerConditions(Trigger* trigger);
-	void executeTrigger(Trigger* trigger);
+	void executeTrigger(Trigger* trigger, std::string currRoom);
 	void updateObject(std::string object_name, std::string status);
 	void deleteObject(std::string object_name);
 	void addObject(std::string object_name, std::string location_name);
 	void openContainer(Container* container, Room* currRoom);
-	void attackCreature(Creature* creature, Item* item);
+	void attackCreature(Creature* creature, Item* item, std::string currRoom);
+	void putItem(std::string itemS, std::string containerS, std::string currRoom);
+	void turnOn(std::string itemS, std::string currRoom);
+	void readItem(std::string itemS);
+	void dropItem(std::string itemS, std::string currRoom);
+	void openContainer(std::string containerS, std::string currRoom);
 	Trigger* checkRoomTriggers(std::string currRoom);
 	std::string changeRoom(std::string command, std::string currRoom);
 	int countWords(std::string input);

@@ -13,6 +13,7 @@ public:
 	virtual ~Container();
 	std::vector<std::string>accepts;
 	std::vector<std::string>items;
+	std::vector<std::string>has;
 	bool open;
 	bool empty;
 };

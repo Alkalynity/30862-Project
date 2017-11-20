@@ -4,8 +4,7 @@ Creature::Creature(rapidxml::xml_node<>*node) {
 	node = node->first_node();
 	std::string node_name;
 	std::string value;
-
-	
+	attack = NULL;
 
 	while (node != NULL) {
 		node_name = node->name();
