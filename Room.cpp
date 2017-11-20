@@ -29,6 +29,9 @@ Room::Room(rapidxml::xml_node<>* node) {
 		else if (node_name == (std::string)"container") {
 			containers.push_back((std::string)value);
 		}
+		else if (node_name == (std::string)"creature") {
+			creatures.push_back((std::string)value);
+		}
 		else if (node_name == (std::string)"type") {
 			type = value;
 		}

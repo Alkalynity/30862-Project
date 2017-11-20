@@ -21,4 +21,3 @@ Trigger* Base::checkTriggers(std::string command) {
 	}
 	return NULL;
 }
-

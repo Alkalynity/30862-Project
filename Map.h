@@ -34,7 +34,6 @@ public:
 	std::map<std::string, Container*> containers;
 	std::map<std::string, Creature*> creatures;
 	std::map<std::string, Room*> rooms;
-	//map<char*, char*> lookup;
 	void printItems();
 	void printInventory();
 	void printContainers();
@@ -55,6 +54,7 @@ private:
 	void addObject(std::string object_name, std::string location_name);
 	void openContainer(Container* container, Room* currRoom);
 	void attackCreature(Creature* creature, Item* item);
+	Trigger* checkRoomTriggers(std::string currRoom);
 	std::string changeRoom(std::string command, std::string currRoom);
 	int countWords(std::string input);
 	std::vector<std::string> tokenizeString(std::string);

@@ -101,22 +101,24 @@ void Map::run() {  // main loop for functionality of program
 
 	bool game_over = false;
 	bool trigger_override = false;
+	bool trigger_update = true;
 
 	std::cout << rooms.find(startRoom)->second->description << std::endl;
 	
 	while (!game_over) {
+		trigger_update = true;
 		std::getline(std::cin, input);
 		std::string first_word = input.substr(0, input.find(" "));
 
 		if (checkInput(input)) {
 			trigger_override = false;
-			std::cout << "Input valid." << std::endl;
+			//std::cout << "Input valid." << std::endl;
 			trigger = checkRoomTriggers(findRoom(currRoom), input);
 
 			// if trigger != NULL, there is a trigger that overrides the given command
 
 			if (trigger != NULL) {
-				std::cout << "TRIGGER FOUND for command: " << input << std::endl;
+				//std::cout << "TRIGGER FOUND for command: " << input << std::endl;
 
 				// check if trigger conditions are met
 				// if so, override command and execute trigger
@@ -169,6 +171,15 @@ void Map::run() {  // main loop for functionality of program
 						else {
 							std::cout << "You take the " << item->name << "." << std::endl;
 							item->owner = "inventory";
+							for (std::vector<std::string>::iterator p = findRoom(currRoom)->containers.begin(); p != findRoom(currRoom)->containers.end(); ++p) {
+								Container* container = findContainer(*p);
+								if (std::find(container->items.begin(), container->items.end(), item->name) != container->items.end()) {
+									container->items.erase(std::remove(container->items.begin(), container->items.end(), item->name), container->items.end());
+									if (container->items.empty()) {
+										container->empty = true;
+									}
+								}
+							}
 						}
 					}
 					else {
@@ -176,14 +187,18 @@ void Map::run() {  // main loop for functionality of program
 					}
 				}
 
-				// open [container], might need testing
+				// open [container]
 
 				else if (first_word == (std::string)"open" && input != (std::string)"open exit" && (countWords(input) == 2)) {
 					std::vector<std::string> words = tokenizeString(input);
 					Container* container = findContainer(words.at(1));
 					if (container != NULL) {
 						if (container->open == true) {
-							std::cout << container->name << " is already open." << std::endl;
+							openContainer(container, findRoom(currRoom));
+							container->open = true;
+						}
+						else if ((std::find(findRoom(currRoom)->containers.begin(), findRoom(currRoom)->containers.end(), words.at(1)) == findRoom(currRoom)->containers.end())) {
+							std::cout << "That isn't in this room." << std::endl;
 						}
 						else {
 							openContainer(container, findRoom(currRoom));
@@ -233,7 +248,7 @@ void Map::run() {  // main loop for functionality of program
 					}
 				}
 
-				// put [item] in [container], might need testing
+				// put [item] in [container], still need to make it so that you can take items back out after putting them in
 
 				else if (first_word == (std::string)"put" && (countWords(input) == 4) && input.find(" in ") != std::string::npos) {
 					std::vector<std::string> words = tokenizeString(input);
@@ -243,12 +258,13 @@ void Map::run() {  // main loop for functionality of program
 						if (item->owner != (std::string)"inventory") {
 							std::cout << "You don't have that item." << std::endl;
 						}
-						else if (container->open == false) {
-							std::cout << "The " << container->name << " isn't open." << std::endl;
-						}
 						else if (std::find(findRoom(currRoom)->containers.begin(), findRoom(currRoom)->containers.end(), container->name) != findRoom(currRoom)->containers.end()) {
-							item->owner = currRoom;
+							item->owner = container->name;
+							if (container->open == true) {
+								item->owner = currRoom;
+							}
 							container->items.push_back(item->name);
+							container->empty = false;
 							std::cout << "You put the " << item->name << " in the " << container->name << "." << std::endl;
 						}
 						else {
@@ -297,7 +313,8 @@ void Map::run() {  // main loop for functionality of program
 						if (item->owner != (std::string)"inventory") {
 							std::cout << "You don't have that item." << std::endl;
 						}
-						else if (std::find(findRoom(currRoom)->creatures.begin(), findRoom(currRoom)->creatures.end(), creature->name) != findRoom(currRoom)->creatures.end()) {
+						// something about this isn't right, check later
+						else if (!(std::find(findRoom(currRoom)->creatures.begin(), findRoom(currRoom)->creatures.end(), creature->name) != findRoom(currRoom)->creatures.end())) {
 							std::cout << "That creature isn't here." << std::endl;
 						}
 						attackCreature(creature, item);
@@ -305,16 +322,124 @@ void Map::run() {  // main loop for functionality of program
 					else {
 						std::cout << "You can't do that." << std::endl;
 					}
-
 				}
-
 			}
 		}
 		else {
 			std::cout << "Invalid input." << std::endl;
 		}
-		// to do: check if other triggers need to be activated
+
+		// check if other triggers are activated
+
+		while (trigger_update == true) {
+			Trigger* trigger = checkRoomTriggers(currRoom);
+			if (trigger != NULL) {
+				executeTrigger(trigger);
+				trigger_update = true;
+			}
+			else {
+				trigger_update = false;
+			}
+		}
 	}
+
+}
+
+// if only the current room is provided as argument,
+// checkRoomTriggers will check every trigger in the room
+// to see if the conditions have been met
+Trigger* Map::checkRoomTriggers(std::string currRoom) {
+	Room* room = findRoom(currRoom);
+	if (room == NULL) {
+		std::cout << "ERROR: ROOM NOT FOUND" << std::endl;
+		return NULL;
+	}
+	// check all triggers associated with the room itself
+	for (std::vector<Trigger*>::iterator p = room->triggers.begin(); p != room->triggers.end(); ++p) {
+		checkTriggerConditions(*p);
+		if ((*p)->conditions_met == true && (*p)->command == (std::string)"") {
+			if ((*p)->completed == false && (*p)->type == (std::string)"single") {
+				return (*p);
+			}
+			else if ((*p)->type == (std::string)"permanent") {
+				return (*p);
+			}
+		}
+	}
+
+	// check all triggers associated with containers in the room
+	for (std::vector<std::string>::iterator p = room->containers.begin(); p != room->containers.end(); ++p) {
+		Container* container = findContainer(*p);
+		if (container != NULL) {
+			for (std::vector<Trigger*>::iterator q = container->triggers.begin(); q != container->triggers.end(); ++q) {
+				checkTriggerConditions(*q);
+				if ((*q)->conditions_met == true && (*q)->command == (std::string)"") {
+					if ((*q)->completed == false && (*q)->type == (std::string)"single") {
+						return (*q);
+					}
+					else if ((*q)->type == (std::string)"permanent") {
+						return (*q);
+					}
+				}
+			}
+		}
+	}
+
+	// check all triggers associated with creatures in the room
+	for (std::vector<std::string>::iterator p = room->creatures.begin(); p != room->creatures.end(); ++p) {
+		Creature* creature = findCreature(*p);
+		if (creature != NULL) {
+			for (std::vector<Trigger*>::iterator q = creature->triggers.begin(); q != creature->triggers.end(); ++q) {
+				checkTriggerConditions(*q);
+				if ((*q)->conditions_met == true && (*q)->command == (std::string)"") {
+					if ((*q)->completed == false && (*q)->type == (std::string)"single") {
+						return (*q);
+					}
+					else if ((*q)->type == (std::string)"permanent") {
+						return (*q);
+					}
+				}
+
+			}
+		}
+	}
+
+	// check all triggers associated with items in the room, INCLUDING items currently in inventory
+	for (std::vector<std::string>::iterator p = room->items.begin(); p != room->items.end(); ++p) {
+		Item* item = findItem(*p);
+		if (item != NULL) {
+			for (std::vector<Trigger*>::iterator q = item->triggers.begin(); q != item->triggers.end(); ++q) {
+				checkTriggerConditions(*q);
+				if ((*q)->conditions_met == true && (*q)->command == (std::string)"") {
+					if ((*q)->completed == false && (*q)->type == (std::string)"single") {
+						return (*q);
+					}
+					else if ((*q)->type == (std::string)"permanent") {
+						return (*q);
+					}
+				}
+			}
+		}
+	}
+
+	// checking items in inventory
+	for (std::map<std::string, Item*>::iterator p = items.begin(); p != items.end(); ++p) {
+		if (p->second->owner == (std::string)"inventory") {
+			for (std::vector<Trigger*>::iterator q = p->second->triggers.begin(); q != p->second->triggers.end(); ++q) {
+				if ((*q)->conditions_met == true && (*q)->command == (std::string)"") {
+					checkTriggerConditions(*q);
+					if ((*q)->completed == false && (*q)->type == (std::string)"single") {
+						return (*q);
+					}
+					else if ((*q)->type == (std::string)"permanent") {
+						return (*q);
+					}
+				}
+			}
+		}
+	}
+
+	return NULL;
 
 }
 
@@ -434,6 +559,10 @@ void Map::printInventory() {
 
 void Map::openContainer(Container* container, Room* currRoom) {
 	bool container_empty = true;
+	if (container->empty == true) {
+		std::cout << container->name << " is empty." << std::endl;
+		return;
+	}
 	std::cout << container->name << " contains: ";
 	for (std::vector<std::string>::iterator p = container->items.begin(); p != container->items.end(); ++p) {
 		if (container_empty != true) {
@@ -444,11 +573,6 @@ void Map::openContainer(Container* container, Room* currRoom) {
 		container_empty = false;
 	}
 	std::cout << std::endl;
-
-	if (container_empty == true) {
-		std::cout << container->name << " is empty." << std::endl;
-	}
-
 }
 
 void Map::printItems() {
@@ -600,6 +724,9 @@ void Map::printTriggers(Trigger* trigger) {
 }
 
 Item* Map::findItem(std::string name) {
+	if (name == (std::string)"") {
+		return NULL;
+	}
 	std::map<std::string, Item*>::iterator p = items.begin();
 	while (p != items.end()) {
 		if (p->second->name == name) {
@@ -611,6 +738,9 @@ Item* Map::findItem(std::string name) {
 }
 
 Container* Map::findContainer(std::string name) {
+	if (name == (std::string)"") {
+		return NULL;
+	}
 	std::map<std::string, Container*>::iterator p = containers.begin();
 	while (p != containers.end()) {
 		if (p->second->name == name) {
@@ -622,6 +752,9 @@ Container* Map::findContainer(std::string name) {
 }
 
 Creature* Map::findCreature(std::string name) {
+	if (name == (std::string)"") {
+		return NULL;
+	}
 	std::map<std::string, Creature*>::iterator p = creatures.begin();
 	while (p != creatures.end()) {
 		if (p->second->name == name) {
@@ -633,6 +766,9 @@ Creature* Map::findCreature(std::string name) {
 }
 
 Room* Map::findRoom(std::string name) {
+	if (name == (std::string)"") {
+		return NULL;
+	}
 	std::map<std::string, Room*>::iterator p = rooms.begin();
 	while (p != rooms.end()) {
 		if (p->second->name == name) {
@@ -659,23 +795,29 @@ Trigger* Map::checkRoomTriggers(Room* current_room, std::string command) {
 
 	for (std::vector<std::string>::iterator q = current_room->items.begin(); q != current_room->items.end(); ++q) {
 		item = findItem(*q);
-		found_trigger = item->checkTriggers(command);
-		if (found_trigger != NULL) {
-			return found_trigger;
+		if (item != NULL) {
+			found_trigger = item->checkTriggers(command);
+			if (found_trigger != NULL) {
+				return found_trigger;
+			}
 		}
 	}
 	for (std::vector<std::string>::iterator q = current_room->containers.begin(); q != current_room->containers.end(); ++q) {
 		container = findContainer(*q);
-		found_trigger = container->checkTriggers(command);
-		if (found_trigger != NULL) {
-			return found_trigger;
+		if (container != NULL) {
+			found_trigger = container->checkTriggers(command);
+			if (found_trigger != NULL) {
+				return found_trigger;
+			}
 		}
 	}
 	for (std::vector<std::string>::iterator q = current_room->creatures.begin(); q != current_room->creatures.end(); ++q) {
 		creature = findCreature(*q);
-		found_trigger = creature->checkTriggers(command);
-		if (found_trigger != NULL) {
-			return found_trigger;
+		if (creature != NULL) {
+			found_trigger = creature->checkTriggers(command);
+			if (found_trigger != NULL) {
+				return found_trigger;
+			}
 		}
 	}
 	return NULL;
@@ -698,6 +840,7 @@ void Map::setItemOwners() {
 
 }
 
+// checks all conditions of a given trigger and sets conditions_met to true if conditions are met
 void Map::checkTriggerConditions(Trigger* trigger) {
 	if (trigger == NULL) {
 		return;
@@ -847,16 +990,17 @@ void Map::deleteObject(std::string object_name) {
 		for (std::map<std::string, Room*>::iterator p = rooms.begin(); p != rooms.end(); ++p) {
 			for (std::vector<std::string>::iterator q = p->second->creatures.begin(); q != p->second->creatures.end(); ++q) {
 				if ((*q) == object_name) {
-					p->second->creatures.erase(std::remove(p->second->creatures.begin(), p->second->creatures.end(), object_name), p->second->creatures.end());
+					(*q) = "";
 				}
 			}
+		
 		}
 	}
 	else if (container != NULL) {
 		for (std::map<std::string, Room*>::iterator p = rooms.begin(); p != rooms.end(); ++p) {
 			for (std::vector<std::string>::iterator q = p->second->containers.begin(); q != p->second->containers.end(); ++q) {
 				if ((*q) == object_name) {
-					p->second->containers.erase(std::remove(p->second->containers.begin(), p->second->containers.end(), object_name), p->second->containers.end());
+					(*q) = "";
 				}
 			}
 		}
@@ -874,14 +1018,14 @@ void Map::deleteObject(std::string object_name) {
 		for (std::map<std::string, Room*>::iterator p = rooms.begin(); p != rooms.end(); ++p) {
 			for (std::vector<std::string>::iterator q = p->second->items.begin(); q != p->second->items.end(); ++q) {
 				if ((*q) == object_name) {
-					p->second->items.erase(std::remove(p->second->items.begin(), p->second->items.end(), object_name), p->second->items.end());
+					(*q) = "";
 				}
 			}
 		}
 		for (std::map<std::string, Container*>::iterator p = containers.begin(); p != containers.end(); ++p) {
 			for (std::vector<std::string>::iterator q = p->second->items.begin(); q != p->second->items.end(); ++q) {
 				if ((*q) == object_name) {
-					p->second->items.erase(std::remove(p->second->items.begin(), p->second->items.end(), object_name), p->second->items.end());
+					(*q) = "";
 				}
 			}
 		}
@@ -891,15 +1035,14 @@ void Map::deleteObject(std::string object_name) {
 	}
 }
 
-void Map::addObject(std::string object_name, std::string location_name) { // doesn't work yet
+void Map::addObject(std::string object_name, std::string location_name) {
 
 	Container* container = findContainer(location_name);
+
 	if (container != NULL) {
 		Item* item = findItem(object_name);
-
 		container->items.push_back(object_name);
 		item->owner = location_name;
-
 	}
 
 	else {
@@ -931,7 +1074,7 @@ void Map::addObject(std::string object_name, std::string location_name) { // doe
 
 	}
 
-	std::cout << "DEBUG: " << object_name << " added to " << location_name << std::endl;
+	//std::cout << "DEBUG: " << object_name << " added to " << location_name << std::endl;
 
 }
 

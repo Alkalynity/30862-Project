@@ -11,6 +11,7 @@
 #include "Base.h"
 #include "Item.h"
 #include "Map.h"
+#include <crtdbg.h>
 
 
 int main(int argc, char* argv[]) {
@@ -26,6 +27,7 @@ int main(int argc, char* argv[]) {
 	game->printCreatures();
 	game->printRooms();
 	*/
+	//_CrtDumpMemoryLeaks();
 	return 0;
 }
 

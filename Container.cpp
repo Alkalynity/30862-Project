@@ -7,6 +7,7 @@ Container::Container(rapidxml::xml_node<> * node) {
 	name = "NO NAME";
 	status = "";
 	open = false;
+	empty = true;
 
 	while (node != NULL) {
 		node_name = node->name();
@@ -23,6 +24,7 @@ Container::Container(rapidxml::xml_node<> * node) {
 		}
 		else if (node_name == (std::string)"item") {
 			items.push_back((std::string)value);
+			empty = false;
 		}
 		else if (node_name == (std::string)"accept") {
 			accepts.push_back((std::string)value);

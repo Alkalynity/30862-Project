@@ -14,6 +14,7 @@ public:
 	std::vector<std::string>accepts;
 	std::vector<std::string>items;
 	bool open;
+	bool empty;
 };
 
 #endif
